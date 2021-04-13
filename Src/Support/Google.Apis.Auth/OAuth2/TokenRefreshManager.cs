@@ -111,7 +111,8 @@ namespace Google.Apis.Auth.OAuth2
                     TaskContinuationOptions.None,
                     TaskScheduler.Default);
             }
-            return (await refreshTask.ConfigureAwait(false)).AccessToken;
+            var haha = await refreshTask.ConfigureAwait(false);
+            return haha.AccessToken;
         }
 
         internal static readonly TimeSpan[] RefreshTimeouts = new[] { TimeSpan.FromSeconds(12), TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(5) };
