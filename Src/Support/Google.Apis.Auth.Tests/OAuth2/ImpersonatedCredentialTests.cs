@@ -228,51 +228,51 @@ namespace Google.Apis.Auth.Tests.OAuth2
             Assert.Equal(errorResponseContent, ex.Error);
         }
 
-        // [Fact]
-        // public async void FetchesAccessToken()
-        // {
-        //     var sourceCredential = GoogleCredential.GetApplicationDefault();
-        //     var targetPrincipal = "sijun-impersonated@dcatest-281318.iam.gserviceaccount.com";
-        //     var initializer = new ImpersonatedCredential.Initializer(sourceCredential, targetPrincipal, null, new string[] {"https://www.googleapis.com/auth/compute"});
-        //     var impersonatedCredential = new ImpersonatedCredential(initializer);
-        //     var success = await impersonatedCredential.RequestAccessTokenAsync(CancellationToken.None).ConfigureAwait(false);
-        // }
+        // ============================================ sample
+        private ImpersonationOptions CreateOptions()
+        {
+            var targetPrincipal = "sijun-impersonated@dcatest-281318.iam.gserviceaccount.com";
+            return new ImpersonationOptions(targetPrincipal, null, null, new string[] {"https://www.googleapis.com/auth/compute"});
+        }
 
-        // [Fact]
-        // public async void FetchesOidcToken()
-        // {
-        //     var sourceCredential = GoogleCredential.GetApplicationDefault();
-        //     //var accessToken = await (sourceCredential.UnderlyingCredential as ServiceAccountCredential).RequestAccessTokenAsync(CancellationToken.None).ConfigureAwait(false);
+        private ImpersonatedCredential CreateCredential()
+        {
+            var sourceCredential = GoogleCredential.GetApplicationDefault();
+            var initializer = new ImpersonatedCredential.Initializer(sourceCredential, CreateOptions());
+            return new ImpersonatedCredential(initializer);
+        }
+
+        [Fact]
+        public async void FetchesAccessToken()
+        {
             
-        //     var targetPrincipal = "sijun-impersonated@dcatest-281318.iam.gserviceaccount.com";
-        //     var initializer = new ImpersonatedCredential.Initializer(sourceCredential, targetPrincipal, null, new string[] {"https://www.googleapis.com/auth/compute"});
-        //     var impersonatedCredential = new ImpersonatedCredential(initializer);
-        //     var options = OidcTokenOptions.FromTargetAudience("https://pubsub.googleapis.com");
-        //     var idToken = await impersonatedCredential.GetOidcTokenAsync(options).ConfigureAwait(false);
-        //     CancellationTokenSource source = new CancellationTokenSource();
-        //     source.CancelAfter(TimeSpan.FromSeconds(100000));
-        //     var token = await idToken.GetAccessTokenAsync(source.Token).ConfigureAwait(false);
-        //     var hoho = token;
-        // }
+            var impersonatedCredential = CreateCredential();
+            var success = await impersonatedCredential.RequestAccessTokenAsync(CancellationToken.None).ConfigureAwait(false);
+        }
 
-        // [Fact]
-        // public async void SignBlob()
-        // {
-        //     var sourceCredential = GoogleCredential.GetApplicationDefault();
-        //     var targetPrincipal = "1sijun-impersonated@dcatest-281318.iam.gserviceaccount.com";
-        //     var initializer = new ImpersonatedCredential.Initializer(sourceCredential, targetPrincipal, null, new string[] {"https://www.googleapis.com/auth/compute"});
-        //     var impersonatedCredential = new ImpersonatedCredential(initializer);
-        //     var toSign = "AAA";
-        //     var bytes = await impersonatedCredential.SignBytes(Encoding.ASCII.GetBytes(toSign)).ConfigureAwait(false);
-        // }
+        [Fact]
+        public async void FetchesOidcToken()
+        {
+            var impersonatedCredential = CreateCredential();
+            var options = OidcTokenOptions.FromTargetAudience("https://pubsub.googleapis.com");
+            var idToken = await impersonatedCredential.GetOidcTokenAsync(options).ConfigureAwait(false);
+            var token = await idToken.GetAccessTokenAsync(CancellationToken.None).ConfigureAwait(false);
+            var hoho = token;
+        }
 
-        // [Fact]
-        // public async void FetchesAccessTokenGoogleCredential()
-        // {
-        //     var sourceCredential = GoogleCredential.GetApplicationDefault();
-        //     var targetPrincipal = "sijun-impersonated@dcatest-281318.iam.gserviceaccount.com";
-        //     var googleCredential = sourceCredential.Impersonate(targetPrincipal, null, new string[] {"https://www.googleapis.com/auth/compute"});
-        //     var accessToken = await (googleCredential as ITokenAccess).GetAccessTokenForRequestAsync(null, CancellationToken.None).ConfigureAwait(false);
-        // }
+        [Fact]
+        public async void SignBlob()
+        {
+            var impersonatedCredential = CreateCredential();
+            var bytes = await impersonatedCredential.SignBlobAsync(Encoding.ASCII.GetBytes("A")).ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async void FetchesAccessTokenGoogleCredential()
+        {
+            var sourceCredential = GoogleCredential.GetApplicationDefault();
+            var googleCredential = sourceCredential.Impersonate(CreateOptions());
+            var accessToken = await (googleCredential as ITokenAccess).GetAccessTokenForRequestAsync(null, CancellationToken.None).ConfigureAwait(false);
+        }
     }
 }
